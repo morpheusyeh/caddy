@@ -41,9 +41,9 @@ import (
 
 	"golang.org/x/net/http2"
 
+	"github.com/caddyserver/caddy/caddyhttp/httpserver"
 	"github.com/lucas-clemente/quic-go"
 	"github.com/lucas-clemente/quic-go/h2quic"
-	"github.com/caddyserver/caddy/caddyhttp/httpserver"
 )
 
 var (
@@ -152,7 +152,7 @@ func singleJoiningSlash(a, b string) string {
 // the target request will be for /base/dir.
 // Without logic: target's path is "/", incoming is "/api/messages",
 // without is "/api", then the target request will be for /messages.
-func NewSingleHostReverseProxy(target *url.URL, without string, keepalive int, timeout, fallbackDelay time.Duration) *ReverseProxy {
+func NewSingleHostReverseProxy(target *url.URL, without string, keepalive int, timeout, fallbackDelay time.Duration, h2c bool) *ReverseProxy {
 	targetQuery := target.RawQuery
 	director := func(req *http.Request) {
 		if target.Scheme == "unix" {
@@ -258,6 +258,15 @@ func NewSingleHostReverseProxy(target *url.URL, without string, keepalive int, t
 			QuicConfig: &quic.Config{
 				HandshakeTimeout: defaultCryptoHandshakeTimeout,
 				KeepAlive:        true,
+			},
+		}
+	} else if h2c {
+		if target.Scheme == "http" {
+			target.Scheme = "https"
+		}
+		rp.Transport = &http2.Transport{
+			DialTLS: func(network, addr string, cfg *tls.Config) (conn net.Conn, e error) {
+				return net.Dial(network, addr)
 			},
 		}
 	} else if keepalive != http.DefaultMaxIdleConnsPerHost || strings.HasPrefix(target.Scheme, "srv") {

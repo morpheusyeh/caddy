@@ -76,6 +76,7 @@ type staticUpstream struct {
 	CaCertPool                   *x509.CertPool
 	upstreamHeaderReplacements   headerReplacements
 	downstreamHeaderReplacements headerReplacements
+	h2c                          bool
 }
 
 type srvResolver interface {
@@ -258,7 +259,7 @@ func (u *staticUpstream) NewHost(host string) (*UpstreamHost, error) {
 		return nil, err
 	}
 
-	uh.ReverseProxy = NewSingleHostReverseProxy(baseURL, uh.WithoutPathPrefix, u.KeepAlive, u.Timeout, u.FallbackDelay)
+	uh.ReverseProxy = NewSingleHostReverseProxy(baseURL, uh.WithoutPathPrefix, u.KeepAlive, u.Timeout, u.FallbackDelay, u.h2c)
 	if u.insecureSkipVerify {
 		uh.ReverseProxy.UseInsecureTransport()
 	}
@@ -564,6 +565,8 @@ func parseBlock(c *caddyfile.Dispenser, u *staticUpstream, hasSrv bool) error {
 			return c.Errf("unable to parse timeout duration '%s'", c.Val())
 		}
 		u.Timeout = dur
+	case "h2c":
+		u.h2c = true
 	default:
 		return c.Errf("unknown property '%s'", c.Val())
 	}
@@ -758,6 +761,10 @@ func (u *staticUpstream) Stop() error {
 	close(u.stop)
 	u.wg.Wait()
 	return nil
+}
+
+func (u *staticUpstream) GetH2c() bool {
+	return u.h2c
 }
 
 // RegisterPolicy adds a custom policy to the proxy.

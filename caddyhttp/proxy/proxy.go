@@ -70,6 +70,8 @@ type Upstream interface {
 
 	// Stops the upstream from proxying requests to shutdown goroutines cleanly.
 	Stop() error
+
+	GetH2c() bool
 }
 
 // UpstreamHostDownFunc can be used to customize how Down behaves.
@@ -204,6 +206,7 @@ func (p Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) {
 					http.DefaultMaxIdleConnsPerHost,
 					upstream.GetTimeout(),
 					upstream.GetFallbackDelay(),
+					upstream.GetH2c(),
 				)
 			}
 

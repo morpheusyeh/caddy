@@ -19,6 +19,67 @@
 </p>
 
 ---
+### V2ray h2c reverse proxy example
+Caddyfile
+```
+your.domain {
+    proxy /path/to/h2 localhost:8000 {
+        header_upstream Host "your.domain"
+        h2c
+    }
+}
+```
+v2ray inbound (server side)
+```json
+{
+  "protocol": "vmess",
+  "port": 8000,
+  "settings": {
+    "clients": [
+      {
+        "id": "your-uuid"
+      }
+    ]
+  },
+  "streamSettings": {
+    "network": "h2",
+    "security": "none",
+    "httpSettings": {
+      "host": ["your.domain"],
+      "path": "/path/to/h2"
+    }
+  }
+}
+```
+v2ray outbound (client side)
+```json
+{
+  "protocol": "vmess",
+  "settings": {
+    "vnext": [
+      {
+        "address": "your.domain",
+        "port": 443,
+        "users": [
+          {
+            "id": "your-uuid"
+          }
+        ]
+      }
+    ]
+  },
+  "streamSettings": {
+    "network": "h2",
+    "security": "tls",
+    "httpSettings": {
+      "host": ["your.domain"],
+      "path": "/path/to/h2"
+    }
+  }
+}
+```
+
+---
 
 Caddy is a **production-ready** open-source web server that is fast, easy to use, and makes you more productive.
 

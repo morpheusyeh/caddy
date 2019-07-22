@@ -18,8 +18,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/caddyserver/caddy"
-	"github.com/caddyserver/caddy/caddyhttp/httpserver"
+	"github.com/morpheusyeh/caddy"
+	"github.com/morpheusyeh/caddy/caddyhttp/httpserver"
 )
 
 func TestSetup(t *testing.T) {

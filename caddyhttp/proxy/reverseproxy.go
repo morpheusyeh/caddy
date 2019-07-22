@@ -41,7 +41,7 @@ import (
 
 	"golang.org/x/net/http2"
 
-	"github.com/caddyserver/caddy/caddyhttp/httpserver"
+	"github.com/morpheusyeh/caddy/caddyhttp/httpserver"
 	"github.com/lucas-clemente/quic-go"
 	"github.com/lucas-clemente/quic-go/h2quic"
 )

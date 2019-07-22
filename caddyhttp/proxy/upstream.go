@@ -36,8 +36,8 @@ import (
 
 	"crypto/tls"
 
-	"github.com/caddyserver/caddy/caddyfile"
-	"github.com/caddyserver/caddy/caddyhttp/httpserver"
+	"github.com/morpheusyeh/caddy/caddyfile"
+	"github.com/morpheusyeh/caddy/caddyhttp/httpserver"
 )
 
 var (
